@@ -21,9 +21,12 @@ muon = cms.EDAnalyzer('MuonMiniAODAnalyzer',
            probeSelection = cms.string("pt()>0"), #string for probe
            pairMassMin = cms.double(2.9), # min mass of mu pair
            pairMassMax = cms.double(300.3), # max mss of mu pair
-           pairDz = cms.double(0.1), #max Dz of mu1,mu2
+           pairDz = cms.double(10.1), #max Dz of mu1,mu2
            RequireVtxCreation = cms.bool(False), # if true kills pairs w/o vtx
            minSVtxProb = cms.double(-0.01), # min prob of mu pair
+           maxDzProbeTrkMuon = cms.double(0.01), # max Dz(mu1,mu2)
+           maxRelPtProbeTrkMuon = cms.double(1.0),# max [pt(mu)-pt(trk)]/pt(trk) for probe/offline
+           maxDRProbeTrkMuon =  cms.double(0.03) # max DR for probe/offline
            
 )
 

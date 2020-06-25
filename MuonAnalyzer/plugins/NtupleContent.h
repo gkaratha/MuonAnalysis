@@ -30,7 +30,7 @@ public:
   float pv_x;        float pv_y;      float pv_z;
 
   //number of muons
-  int nmuons;          int npairs;             
+  int nmuons;        int ntag;        int iprobe;       
   
   //triggers
   bool trigger[10];
@@ -46,12 +46,18 @@ public:
   float probe_pt;        float probe_eta;        float probe_phi;
   bool probe_isLoose;    bool probe_isMedium;    bool probe_isTight;   
   bool probe_isSoft;     bool probe_isHighPt;    bool probe_isMuMatched;
+  bool probe_isPF;       bool probe_isGlobal;    bool probe_isGood;
+  bool probe_isHighPurity;
 
+  float probe_validFraction; float probe_trkChi2;   float probe_positionChi2; 
+  float probe_trkKink;       float probe_segmentCompatibility;
+  float probe_trackerLayers; float probe_pixelLayers; 
+  float probe_dxy;           float probe_dz;
 
   // pair properties
   float pair_pt;         float pair_mass;        float pair_eta;
   float pair_phi;        float pair_fit_mass;    float pair_svprob;
-  float pair_dz;
+  float pair_dz;         float pair_first_pair;
 
 
  private:

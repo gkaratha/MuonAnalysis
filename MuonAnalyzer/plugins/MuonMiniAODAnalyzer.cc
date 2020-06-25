@@ -34,6 +34,7 @@
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
 
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "FWCore/Common/interface/TriggerNames.h"
@@ -120,6 +121,9 @@ private:
   const double pairDz_;
   const bool RequireVtxCreation_; //if true skip pairs that do not create gthat do not have a vertex
   const double minSVtxProb_; //min probability of a vertex to be kept. If <0 inactive
+  const double maxdz_trk_mu_;
+  const double maxpt_relative_dif_trk_mu_;
+  const double maxdr_trk_mu_;
 
   edm::Service<TFileService> fs;
   TTree * t1;
@@ -155,7 +159,11 @@ trgresultsToken_(consumes<edm::TriggerResults >(iConfig.getParameter<edm::InputT
  pairMassMax_(iConfig.getParameter<double>("pairMassMax")),
  pairDz_(iConfig.getParameter<double>("pairDz")),
  RequireVtxCreation_(iConfig.getParameter<bool>("RequireVtxCreation")),
- minSVtxProb_(iConfig.getParameter<double>("minSVtxProb"))
+ minSVtxProb_(iConfig.getParameter<double>("minSVtxProb")),
+ maxdz_trk_mu_(iConfig.getParameter<double>("maxDzProbeTrkMuon")),
+ maxpt_relative_dif_trk_mu_(iConfig.getParameter<double>("maxRelPtProbeTrkMuon")),
+ maxdr_trk_mu_(iConfig.getParameter<double>("maxDRProbeTrkMuon"))
+
  
 {
 //  edm::ParameterSet runParameters=iConfig.getParameter<edm::ParameterSet>("RunParameters");
@@ -252,41 +260,35 @@ MuonMiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
                    );
   }
   if ( tag_muon_ttrack.size()==0) return;
+  nt.nmuons=muons->size();
+  nt.ntag=tag_muon_ttrack.size();
 
   // add Lost Tracks to Paclked cands
   std::vector<pat::PackedCandidate> tracks;
-  //map pfcands to probe muons (both operation simultaneously
-  std::vector<std::pair<bool,unsigned>> trk_to_muon;
-  for ( const pat::PackedCandidate & trk: *pfcands){
-    if( !probeSelection_(trk) ) continue;
-    if( !trk.hasTrackDetails()) continue;
-    if ( HighPurity_ && !trk.trackHighPurity() ) continue;
-    tracks.emplace_back(trk);
-    bool found=false;
-    unsigned Idx=0;
-    for (const auto &mu: *muons){
-      if ( mu.bestTrack() != trk.bestTrack() && trk.bestTrack()!=NULL  ) continue;
-      Idx=&mu-&(muons->at(0));
-      found=true;
-      break;
+  for (const auto container : {pfcands,lostTracks} ){
+    for ( const pat::PackedCandidate & trk: *container){
+      if( !probeSelection_(trk) ) continue;
+      if( !trk.hasTrackDetails()) continue;
+      if ( HighPurity_ && !trk.trackHighPurity() ) continue;
+      tracks.emplace_back(trk);
     }
-    trk_to_muon.emplace_back(std::make_pair(found,Idx));
   }
-  
-  for ( const pat::PackedCandidate & trk: *lostTracks){
-    if( !probeSelection_(trk) ) continue;
-    if( !trk.hasTrackDetails()) continue;
-    if ( HighPurity_ && !trk.trackHighPurity() ) continue;
-    tracks.emplace_back(trk);
-    bool found=false;
-    unsigned Idx=0;
-    for (const auto &mu: *muons){
-      if ( mu.bestTrack() != trk.bestTrack() && trk.bestTrack()!=NULL  ) continue;
-      Idx=&mu-&(muons->at(0));
-      found=true;
-      break;
+
+  std::pair<std::vector<unsigned>,std::vector<unsigned>> trk_muon_map;
+  for (const auto &mu: *muons){
+    float minDR=1000;
+    unsigned int idx_trk;
+    for (const auto &trk: tracks){
+      if (mu.charge() != trk.charge()) continue;
+      if (fabs(mu.vz()-trk.vz())>maxdz_trk_mu_) continue;
+      if (fabs(mu.pt()-trk.pt())/mu.pt()>maxpt_relative_dif_trk_mu_) continue;
+      float DR=deltaR(mu.eta(),mu.phi(),trk.eta(),trk.phi());
+      if (minDR<DR) continue;
+      minDR=DR;
+      idx_trk=&trk -&tracks[0];
     }
-    trk_to_muon.emplace_back(std::make_pair(found,Idx));
+    if (minDR>maxdr_trk_mu_) continue;
+    trk_muon_map.first.push_back(idx_trk); trk_muon_map.second.push_back(&mu-&muons->at(0));
   }
     
 
@@ -298,7 +300,7 @@ MuonMiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       float mass = DimuonMass(tag.first.pt(), tag.first.eta(), tag.first.phi(),
                               probe.pt(), probe.eta(), probe.phi()
                               );
-
+      
       if ( mass<pairMassMin_ && mass>pairMassMax_) continue;
       std::vector<reco::TransientTrack> trk_pair={tag.second,
                                       reco::TransientTrack(probe.pseudoTrack(),&(*bField)) };
@@ -311,12 +313,17 @@ MuonMiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       math::PtEtaPhiMLorentzVector mu2(probe.pt(), probe.eta(), probe.phi(), MU_MASS);
       FillTagBranches<pat::Muon> (tag.first,nt);
       FillPairBranches<pat::Muon,pat::PackedCandidate>(tag.first,probe,nt);
-      
-      if (trk_to_muon[&probe-&tracks[0]].first ){
-         FillProbeBranches<pat::Muon> (muons->at(trk_to_muon[&probe-&tracks[0]].second),nt);
+      std::vector<unsigned>::iterator it = std::find( trk_muon_map.first.begin(), trk_muon_map.first.end(), &probe - &tracks[0]);
+      if ( it != trk_muon_map.first.end() ){
+         unsigned idx=std::distance(trk_muon_map.first.begin(),it);
+         FillProbeBranches<pat::Muon> (muons->at(trk_muon_map.second[idx]),nt,true);
       } else{
-         FillProbeBranches<pat::PackedCandidate> (probe,nt);
+         reco::Muon fakeMuon;
+         fakeMuon.setP4(mu2);
+         FillProbeBranches<reco::Muon> (fakeMuon,nt,false);
       }
+      nt.iprobe++;
+      nt.probe_isHighPurity=probe.trackHighPurity();
       FillTagBranches<pat::Muon> (tag.first,nt);
       FillPairBranches<pat::Muon,pat::PackedCandidate>(tag.first,probe,nt);
       t1->Fill();

@@ -32,7 +32,8 @@ muon = cms.EDAnalyzer('MuonFullAODAnalyzer',
            minSVtxProb = cms.double(0.01),
            maxDzProbeTrkMuon = cms.double(0.01), # max Dz(mu1,mu2)
            maxRelPtProbeTrkMuon = cms.double(1.0),# max [pt(mu)-pt(trk)]/pt(trk) for probe/offline
-           maxDRProbeTrkMuon =  cms.double(0.03) # max DR for probe/offline
+           maxDRProbeTrkMuon =  cms.double(0.03), # max DR for probe/offline
+           debug = cms.int32(1)
            
 )
 

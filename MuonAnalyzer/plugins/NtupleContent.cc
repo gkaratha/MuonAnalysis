@@ -23,6 +23,8 @@ NtupleContent::CreateBranches(const std::vector<std::string> & HLTs){
   t1->Branch("pv_x", &pv_x);
   t1->Branch("pv_y", &pv_y);
   t1->Branch("pv_z", &pv_z);
+  t1->Branch("nmuons", &nmuons);  
+  t1->Branch("ntag", &ntag);
   for( unsigned int ihlt=0; ihlt<HLTs.size(); ihlt++)
     t1->Branch(TString(HLTs[ihlt]), &trigger[ihlt]); 
   // tag specific
@@ -35,6 +37,7 @@ NtupleContent::CreateBranches(const std::vector<std::string> & HLTs){
   t1->Branch("tag_isSoft", &tag_isSoft);
   t1->Branch("tag_isHighPt", &tag_isHighPt);
   // probe specific
+  t1->Branch("iprobe", &iprobe);
   t1->Branch("probe_pt", &probe_pt);
   t1->Branch("probe_eta", &probe_eta);
   t1->Branch("probe_phi", &probe_phi);
@@ -44,6 +47,19 @@ NtupleContent::CreateBranches(const std::vector<std::string> & HLTs){
   t1->Branch("probe_isSoft", &probe_isSoft);
   t1->Branch("probe_isHighPt", &probe_isHighPt);
   t1->Branch("probe_isMuMatched", &probe_isMuMatched);
+  t1->Branch("probe_isPF", &probe_isPF);
+  t1->Branch("probe_isGlobal", &probe_isGlobal);
+//  t1->Branch("probe_isGood", &probe_isGood);
+  t1->Branch("probe_isHighPurity", &probe_isHighPurity);
+  t1->Branch("probe_validFraction", &probe_validFraction);
+  t1->Branch("probe_trkChi2", &probe_trkChi2);
+  t1->Branch("probe_positionChi2", &probe_positionChi2);
+  t1->Branch("probe_trkKink", &probe_trkKink);
+ // t1->Branch("probe_segmentCompatibility", &probe_segmentCompatibility);
+  t1->Branch("probe_trackerLayers", &probe_trackerLayers);
+  t1->Branch("probe_pixelLayers", &probe_pixelLayers);
+  t1->Branch("probe_dxy", &probe_dxy);
+  t1->Branch("probe_dz", &probe_dz);
   // pair specific
   t1->Branch("pair_pt", &pair_pt);
   t1->Branch("pair_eta", &pair_eta);
@@ -61,7 +77,7 @@ NtupleContent::ClearBranches(){
   BSpot_x=-99;            BSpot_y=-99;                BSpot_z=-99;  
   pv_x=-99;               pv_y=-99;                   pv_z=-99;
 
-  nmuons=0;               npairs=0;                   
+  nmuons=0;               ntag=0;
 
   for (unsigned int itrg=0; itrg<10; itrg++) trigger[itrg]=false;
   trg_pt.clear();         trg_eta.clear();            trg_phi.clear();
@@ -70,9 +86,16 @@ NtupleContent::ClearBranches(){
   tag_isLoose=false;      tag_isMedium=false;         tag_isTight=false;
   tag_isSoft=false;       tag_isHighPt=false; 
 
+  iprobe=0;
   probe_pt=0;             probe_eta=-99;              probe_phi=-99;
   probe_isLoose=false;    probe_isMedium=false;       probe_isTight=false;
   probe_isSoft=false;     probe_isHighPt=false;       probe_isMuMatched=false;
+  probe_isPF=false;       probe_isGlobal=false;       probe_isGood=false;
+  probe_isHighPurity=false;
+  probe_validFraction=-99;probe_trkChi2=-99;          probe_positionChi2=-99;
+  probe_trkKink=-99;      probe_segmentCompatibility=-99;
+  probe_trackerLayers=-99; probe_pixelLayers=-99;     probe_dxy=-99;
+  probe_dz=-99;
 
   pair_pt=0;              pair_mass=0;                pair_eta=-99;
   pair_phi=-99;           pair_fit_mass=0;            pair_svprob=0; 
