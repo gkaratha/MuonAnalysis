@@ -323,7 +323,7 @@ MuonFullAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
                               probe.pt(), probe.eta(), probe.phi() 
                               );
                               
-      if ( mass<pairMassMin_ && mass>pairMassMax_) continue;
+      if ( mass<pairMassMin_ || mass>pairMassMax_) continue;
       std::vector<reco::TransientTrack> trk_pair={tag.second,
                                       reco::TransientTrack(probe,&(*bField)) };       
       KlFitter vtx(trk_pair);     
