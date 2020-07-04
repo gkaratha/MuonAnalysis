@@ -20,6 +20,7 @@ public:
   virtual ~NtupleContent();
   void SetTree(TTree * t1);
   void CreateBranches(const std::vector<std::string> &);
+  void CreateExtraTrgBranches(const std::vector<std::string> &);
   void ClearBranches();
   
   // standard stuff
@@ -37,17 +38,29 @@ public:
   std::vector<float> trg_pt;     std::vector<float> trg_eta;
   std::vector<float> trg_phi;
 
+  std::vector<float> prb_pt;     std::vector<float> prb_eta;
+  std::vector<float> prb_phi;
+  //triggers - probe
+  bool probe_trg[10]={false};
+
+  float genmu1_pt;     float genmu1_eta;       float genmu1_phi;
+  float genmu2_pt;     float genmu2_eta;       float genmu2_phi;
+
+
   // tag properties
   float tag_pt;        float tag_eta;          float tag_phi;    
   bool tag_isLoose;    bool tag_isMedium;      bool tag_isTight;   
-  bool tag_isSoft;     bool tag_isHighPt;     
+  bool tag_isSoft;     bool tag_isHighPt;      float tag_relIso04;
+  bool tag_isMatchedGen;
+
 
   // probe properties
   float probe_pt;        float probe_eta;        float probe_phi;
   bool probe_isLoose;    bool probe_isMedium;    bool probe_isTight;   
   bool probe_isSoft;     bool probe_isHighPt;    bool probe_isMuMatched;
   bool probe_isPF;       bool probe_isGlobal;    bool probe_isGood;
-  bool probe_isHighPurity;
+  bool probe_isHighPurity;                       float probe_relIso04;
+  bool probe_isMatchedGen;
 
   float probe_validFraction; float probe_trkChi2;   float probe_positionChi2; 
   float probe_trkKink;       float probe_segmentCompatibility;

@@ -13,12 +13,14 @@
 #include "DataFormats/MuonReco/interface/MuonSelectors.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+
 #include "helper.h"
 #include "NtupleContent.h"
 #include <type_traits>
 
-template<typename MUON>
-inline void FillTagBranches( const MUON & muon, NtupleContent & nt){
+template<typename MUON,typename TRK>
+inline void FillTagBranches( const MUON & muon, const std::vector<TRK> &tracks, NtupleContent & nt){
   nt.tag_pt=muon.pt();
   nt.tag_eta=muon.eta();
   nt.tag_phi=muon.phi();
@@ -27,48 +29,44 @@ inline void FillTagBranches( const MUON & muon, NtupleContent & nt){
   nt.tag_isTight=muon.passed(reco::Muon::CutBasedIdTight);
   nt.tag_isSoft=muon.passed(reco::Muon::SoftCutBasedId);
   nt.tag_isHighPt=muon.passed(reco::Muon::CutBasedIdTrkHighPt);
+  float iso04= (TrackerEnergy04<TRK> (muon.eta(),muon.phi(), tracks) -muon.pt() )/ muon.pt();
+  nt.tag_relIso04=(iso04>0) ? iso04 : 0;
+
 }
 
-template<typename MUON>
-inline void FillSuccessProbeBranches( const MUON & muon, NtupleContent & nt){
- nt.probe_isLoose=muon.passed(reco::Muon::CutBasedIdLoose);
- // nt.probe_isMedium=muon.passed(reco::Muon::CutBasedIdMedium);
- // nt.probe_isTight=muon.passed(reco::Muon::CutBasedIdTight);
- // nt.probe_isSoft=muon.passed(reco::Muon::SoftCutBasedId);
- // nt.probe_isHighPt=muon.passed(reco::Muon::CutBasedIdTrkHighPt);
-}
 
-template<typename TRK>
-inline void FillProbeBranches( const TRK & trk, NtupleContent & nt, bool success){
-  nt.probe_pt=trk.pt();
-  nt.probe_eta=trk.eta();
-  nt.probe_phi=trk.phi();
+template<typename MUON,typename TRK>
+inline void FillProbeBranches( const MUON & mu, const std::vector<TRK> &tracks, NtupleContent & nt, bool success){
+  nt.probe_pt=mu.pt();
+  nt.probe_eta=mu.eta();
+  nt.probe_phi=mu.phi();
+  float iso04= (TrackerEnergy04<TRK> (mu.eta(),mu.phi(), tracks) -mu.pt() )/ mu.pt();
+  nt.probe_relIso04=(iso04>0) ? iso04 : 0;
   if (success){
-     //FillSuccessProbeBranches<reco::Muon>(trk,nt);
-     nt.probe_isLoose=trk.passed(reco::Muon::CutBasedIdLoose);
-     nt.probe_isMedium=trk.passed(reco::Muon::CutBasedIdMedium);
-     nt.probe_isTight=trk.passed(reco::Muon::CutBasedIdTight);
-     nt.probe_isSoft=trk.passed(reco::Muon::SoftCutBasedId);
-     nt.probe_isHighPt=trk.passed(reco::Muon::CutBasedIdTrkHighPt);
-     nt.probe_isPF=trk.isPFMuon();
-     nt.probe_isGlobal=trk.isGlobalMuon();
-     if ( trk.globalTrack().isNonnull() )
-        nt.probe_trkChi2=trk.globalTrack()->normalizedChi2();
+     nt.probe_isLoose=mu.passed(reco::Muon::CutBasedIdLoose);
+     nt.probe_isMedium=mu.passed(reco::Muon::CutBasedIdMedium);
+     nt.probe_isTight=mu.passed(reco::Muon::CutBasedIdTight);
+     nt.probe_isSoft=mu.passed(reco::Muon::SoftCutBasedId);
+     nt.probe_isHighPt=mu.passed(reco::Muon::CutBasedIdTrkHighPt);
+     nt.probe_isPF=mu.isPFMuon();
+     nt.probe_isGlobal=mu.isGlobalMuon();
+     if ( mu.globalTrack().isNonnull() )
+        nt.probe_trkChi2=mu.globalTrack()->normalizedChi2();
      else
         nt.probe_trkChi2=-99;
-     if ( trk.innerTrack().isNonnull() &&  trk.innerTrack().isAvailable() ){
-        nt.probe_validFraction=trk.innerTrack()->validFraction();
-        nt.probe_trackerLayers=trk.innerTrack()->hitPattern().trackerLayersWithMeasurement();
-        nt.probe_pixelLayers=trk.innerTrack()->hitPattern().pixelLayersWithMeasurement();
-        nt.probe_dxy=trk.innerTrack()->dxy(reco::TrackBase::Point(nt.pv_x,nt.pv_y,nt.pv_z));
-        nt.probe_dz=trk.innerTrack()->dz(reco::TrackBase::Point(nt.pv_x,nt.pv_y,nt.pv_z));
+     if ( mu.innerTrack().isNonnull() &&  mu.innerTrack().isAvailable() ){
+        nt.probe_validFraction=mu.innerTrack()->validFraction();
+        nt.probe_trackerLayers=mu.innerTrack()->hitPattern().trackerLayersWithMeasurement();
+        nt.probe_pixelLayers=mu.innerTrack()->hitPattern().pixelLayersWithMeasurement();
+        nt.probe_dxy=mu.innerTrack()->dxy(reco::TrackBase::Point(nt.pv_x,nt.pv_y,nt.pv_z));
+        nt.probe_dz=mu.innerTrack()->dz(reco::TrackBase::Point(nt.pv_x,nt.pv_y,nt.pv_z));
     } else{
         nt.probe_validFraction=-99;   nt.probe_trackerLayers=-99;   
         nt.probe_pixelLayers=-99;     nt.probe_dxy=-99;  
         nt.probe_dz=-99;
     }
-     nt.probe_positionChi2=trk.combinedQuality().chi2LocalPosition;
-     nt.probe_trkKink=trk.combinedQuality().trkKink;
+     nt.probe_positionChi2=mu.combinedQuality().chi2LocalPosition;
+     nt.probe_trkKink=mu.combinedQuality().trkKink;
 //     nt.probe_segmentCompatibility= 
      nt.probe_isMuMatched=true;
   }

@@ -20,12 +20,15 @@ muon = cms.EDAnalyzer('MuonFullAODAnalyzer',
            triggerObjects=cms.InputTag('hltTriggerSummaryAOD'),
            triggerPaths=cms.vstring(Path),
            triggerFilters=cms.vstring(Filter),
+           gen = cms.InputTag("genParticles"),
+           ProbePaths=cms.vstring(Path),
+           ProbeFilters=cms.vstring(Filter),
            trgDRwindow= cms.double(0.05), # dr winwow hlt mu/offline
            tagQuality = cms.uint32(0),
            tagSelection = cms.string("pt()>0"),
            probeHPyrity = cms.bool(True),
            probeSelection = cms.string("pt()>0"),
-           pairMassMin = cms.double(2.9),
+           pairMassMin = cms.double(2.7),
            pairMassMax = cms.double(3.3),
            pairDz = cms.double(10.1),
            RequireVtxCreation = cms.bool(False),
@@ -33,7 +36,9 @@ muon = cms.EDAnalyzer('MuonFullAODAnalyzer',
            maxDzProbeTrkMuon = cms.double(0.01), # max Dz(mu1,mu2)
            maxRelPtProbeTrkMuon = cms.double(1.0),# max [pt(mu)-pt(trk)]/pt(trk) for probe/offline
            maxDRProbeTrkMuon =  cms.double(0.03), # max DR for probe/offline
-           debug = cms.int32(1)
+           momPdgId= cms.uint32(443),
+           genRecoDrMatch = cms.double(0.03),
+           debug = cms.int32(0)
            
 )
 
