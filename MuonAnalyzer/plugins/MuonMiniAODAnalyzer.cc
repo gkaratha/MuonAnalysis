@@ -228,7 +228,7 @@ MuonMiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   edm::Handle<std::vector<pat::PackedCandidate>> pfcands;
   iEvent.getByToken(PFCands_,pfcands);
   edm::Handle<std::vector<pat::PackedCandidate>>lostTracks;
-  iEvent.getByToken(PFCands_,lostTracks);
+  iEvent.getByToken(LostTracks_,lostTracks);
   edm::ESHandle<MagneticField> bField;
   iSetup.get<IdealMagneticFieldRecord>().get(bField);
 
