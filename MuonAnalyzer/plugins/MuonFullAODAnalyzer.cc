@@ -369,7 +369,7 @@ MuonFullAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
      if ( tag.first.charge()==probe.charge()) continue;
 
       //apply cuts on pairs selected will be saved       
-      if ( tag.first.charge()==probe.charge()) continue;
+      if (!probeSelection_(probe)) continue;
       if (fabs(tag.first.vz() - probe.vz())> pairDz_ && pairDz_>0 ) continue;
       float mass = DimuonMass(tag.first.pt(), tag.first.eta(), tag.first.phi(), 
                               probe.pt(), probe.eta(), probe.phi() 
