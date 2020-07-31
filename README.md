@@ -7,7 +7,7 @@ runs with cmsRun run_muonAnalizer_cfg.py option1=val1
 run_muonAnalizer_cfg.py is located under the "test" directory
 
 Instructions:
-cmsrel CMSSW_10_5_0
+cmsrel CMSSW_10_5_0 
 cd CMSSW_10_5_0/src
 cmsenv
 git cms-init
