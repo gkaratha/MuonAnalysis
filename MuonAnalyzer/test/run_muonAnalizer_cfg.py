@@ -32,7 +32,7 @@ options.register('reportEvery', 1,
     "Report frequency"
 )
 
-options.register('maxEvts', 100,
+options.register('maxEvts', 1000,
     VarParsing.multiplicity.singleton,
     VarParsing.varType.int,
     "Total evts to process"
@@ -44,7 +44,7 @@ options.register('inputs', [],
     "Input file to run on"
 )
 
-options.register('outputName', '',
+options.register('outputName', 'test',
     VarParsing.multiplicity.singleton,
     VarParsing.varType.string,
     "Name of the output ntuple"
@@ -58,12 +58,13 @@ if options._beenSet['globalTag']: globaltag = options.globalTag
 
 if options.isFullAOD:
   if options.isMC and len(options.inputs)==0:
-     options.inputs.append('/store/mc/RunIIAutumn18DRPremix/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/80002/FF9AF238-78B6-CF48-BC7C-05025D85A45C.root')
+   #  options.inputs.append('/store/mc/RunIIAutumn18DRPremix/DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/80002/FF9AF238-78B6-CF48-BC7C-05025D85A45C.root')
+    options.inputs.append('/store/mc/RunIIAutumn18DRPremix/ZToMuMu_NNPDF31_13TeV-powheg_M_6000_Inf/AODSIM/102X_upgrade2018_realistic_v15-v2/100000/E1A8A683-75A3-3145-AE70-567939DC935E.root')
   elif not options.isMC and len(options.inputs)==0:
-     options.inputs.append('/store/data/Run2018C/SingleMuon/AOD/17Sep2018-v1/60004/FB123080-071C-F64D-BAFD-F2F292F7FC64.root')
+     options.inputs.append('/store/hidata/HIRun2018A/HISingleMuon/AOD/04Apr2019-v1/10000/0CAC290B-5FAD-BB4A-B607-922EE6B663B0.root')
 else:
    if options.isMC and len(options.inputs)==0:
-     options.inputs.append('/store/mc/RunIIAutumn18MiniAOD/DYJetsToLL_M-50_Zpt-150toInf_TuneCP5_13TeV-madgraphMLM-pythia8/MINIAODSIM/102X_upgrade2018_realistic_v15-v1/100000/FAACE9E0-1D0E-204E-9960-078F095EA34C.root')
+     options.inputs.append('/store/mc/RunIISummer19UL18MiniAOD/ZToMuMu_NNPDF31_TuneCP5_13TeV-powheg-pythia8_M_50_120/MINIAODSIM/106X_upgrade2018_realistic_v11_L1v1-v2/270000/6F4530BA-A272-FC48-9F82-90DD3A4E345A.root')
    elif not options.isMC and len(options.inputs)==0:
      options.inputs.append('/store/data/Run2018D/SingleMuon/MINIAOD/PromptReco-v2/000/325/159/00000/BE9BB28C-8AEC-1B4B-A7BD-AD1C9A0D67A8.root')
 
@@ -99,7 +100,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(options.maxE
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring( options.inputs ),
    secondaryFileNames=cms.untracked.vstring(),
-#   eventsToProcess=cms.untracked.VEventRange("316187:827:MIN-316187:827:MAX"),
+   #eventsToProcess=cms.untracked.VEventRange("327237:743:390541975-327237:743:390541977"),
    inputCommands=cms.untracked.vstring(
                   'keep *',
                   'drop *_ctppsPixelClusters_*_*')

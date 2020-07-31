@@ -17,19 +17,19 @@ muon = cms.EDAnalyzer('MuonMiniAODAnalyzer',
            gen = cms.InputTag("prunedGenParticles"),
            HLTPaths=cms.vstring(Path),
            ProbePaths=cms.vstring(Path),
-           tagQuality = cms.uint32(0), # quality of tag muon following muonSelector convention
-           tagSelection = cms.string("pt()>0"), # string to pass cuts on tag
+           tagQuality = cms.int32(3), # quality of tag muon following muonSelector convention
+           tagSelection = cms.string("pt()>5 && abs(eta())<2.4"), # string to pass cuts on tag
            ProbeHPyrity = cms.bool(True), # skips non High purity probes
            probeSelection = cms.string("pt()>0"), #string for probe
-           pairMassMin = cms.double(2.9), # min mass of mu pair
-           pairMassMax = cms.double(3.3), # max mss of mu pair
-           pairDz = cms.double(10.1), #max Dz of mu1,mu2
+           pairMassMin = cms.double(70), # min mass of mu pair
+           pairMassMax = cms.double(120), # max mss of mu pair
+           pairDz = cms.double(0.7), #max Dz of mu1,mu2
            RequireVtxCreation = cms.bool(False), # if true kills pairs w/o vtx
            minSVtxProb = cms.double(-0.01), # min prob of mu pair
-           maxDzProbeTrkMuon = cms.double(0.01), # max Dz(mu1,mu2)
-           maxRelPtProbeTrkMuon = cms.double(1.0),# max [pt(mu)-pt(trk)]/pt(trk) for probe/offline
+           maxDzProbeTrkMuon = cms.double(1.0), # max Dz(mu1,mu2)
+           maxRelPtProbeTrkMuon = cms.double(20.0),# max [pt(mu)-pt(trk)]/pt(trk) for probe/offline
            maxDRProbeTrkMuon =  cms.double(0.03), # max DR for probe/offline
-           momPdgId = cms.uint32(443),
+           momPdgId = cms.uint32(23),
            genRecoDrMatch= cms.double(0.03)
            
 )

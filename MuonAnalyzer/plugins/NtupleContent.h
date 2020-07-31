@@ -51,7 +51,9 @@ public:
   float tag_pt;        float tag_eta;          float tag_phi;    
   bool tag_isLoose;    bool tag_isMedium;      bool tag_isTight;   
   bool tag_isSoft;     bool tag_isHighPt;      float tag_relIso04;
-  bool tag_isMatchedGen;
+  bool tag_isMatchedGen; 
+  float tag_ptErr;     float tag_PFSumIso03;   bool tag_isGlobal;
+  bool tag_isSTA;      bool tag_isTrkMuon;    
 
 
   // probe properties
@@ -61,11 +63,17 @@ public:
   bool probe_isPF;       bool probe_isGlobal;    bool probe_isGood;
   bool probe_isHighPurity;                       float probe_relIso04;
   bool probe_isMatchedGen;
+  bool probe_isSTA;      bool probe_isTrkMuon;       
 
   float probe_validFraction; float probe_trkChi2;   float probe_positionChi2; 
   float probe_trkKink;       float probe_segmentCompatibility;
   float probe_trackerLayers; float probe_pixelLayers; 
   float probe_dxy;           float probe_dz;
+
+  float probe_pixelHits;     float probe_muonHits;   float probe_muonHits_tuneP;
+  int probe_nStation;       int probe_RPCLayers;     int probe_stMask;
+  int probe_nShowers;       float probe_ptErr;       float probe_PFSumIso03;
+  float probe_nStation_Exp;
 
   // pair properties
   float pair_pt;         float pair_mass;        float pair_eta;

@@ -21,9 +21,13 @@
 
 template<typename MUON,typename TRK>
 inline void FillTagBranches( const MUON & muon, const std::vector<TRK> &tracks, NtupleContent & nt){
-  nt.tag_pt=muon.pt();
+  nt.tag_pt=muon.tunePMuonBestTrack()->pt();
+  nt.tag_ptErr=muon.tunePMuonBestTrack()->ptError();
   nt.tag_eta=muon.eta();
   nt.tag_phi=muon.phi();
+  nt.tag_isGlobal=muon.isGlobalMuon();
+  nt.tag_isSTA=muon.isStandAloneMuon();
+  nt.tag_isTrkMuon=muon.isTrackerMuon();
   nt.tag_isLoose=muon.passed(reco::Muon::CutBasedIdLoose);
   nt.tag_isMedium=muon.passed(reco::Muon::CutBasedIdMedium);
   nt.tag_isTight=muon.passed(reco::Muon::CutBasedIdTight);
@@ -31,18 +35,31 @@ inline void FillTagBranches( const MUON & muon, const std::vector<TRK> &tracks, 
   nt.tag_isHighPt=muon.passed(reco::Muon::CutBasedIdTrkHighPt);
   float iso04= (TrackerEnergy04<TRK> (muon.eta(),muon.phi(), tracks) -muon.pt() )/ muon.pt();
   nt.tag_relIso04=(iso04>0) ? iso04 : 0;
-
+ // nt.tag_PFSumIso03=muon.isolationR03 ().sumPt();
 }
 
 
 template<typename MUON,typename TRK>
 inline void FillProbeBranches( const MUON & mu, const std::vector<TRK> &tracks, NtupleContent & nt, bool success){
-  nt.probe_pt=mu.pt();
-  nt.probe_eta=mu.eta();
-  nt.probe_phi=mu.phi();
+  nt.probe_pt=mu.pt();       nt.probe_eta=mu.eta();       nt.probe_phi=mu.phi();
+  //initialize
+  nt.probe_ptErr=-99;        nt.probe_validFraction=-99;  nt.probe_trackerLayers=-99;
+  nt.probe_pixelLayers=-99;  nt.probe_dxy=-99;            nt.probe_dz=-99;
+  nt.probe_isGlobal=false;   nt.probe_isSTA=false;        nt.probe_isTrkMuon=false;
+  nt.probe_PFSumIso03=-99;   nt.probe_isLoose=false;      nt.probe_isMedium=false;
+  nt.probe_isTight=false;    nt.probe_isSoft=false;       nt.probe_isHighPt=false;       
+  nt.probe_isMuMatched=false; nt.probe_isPF=false;        nt.probe_isGlobal=false;
+  nt.probe_validFraction=-99; nt.probe_trkChi2=-99;       nt.probe_positionChi2=-99;    
+  nt.probe_trkKink=-99;       nt.probe_dxy=-99;           nt.probe_dz=-99;
+  nt.probe_pixelHits=-99;     nt.probe_muonHits=-99;      nt.probe_muonHits_tuneP=-99;
+  nt.probe_nStation=0;        nt.probe_RPCLayers=0;       nt.probe_stMask=-99;
+  nt.probe_nShowers=0;
   float iso04= (TrackerEnergy04<TRK> (mu.eta(),mu.phi(), tracks) -mu.pt() )/ mu.pt();
   nt.probe_relIso04=(iso04>0) ? iso04 : 0;
   if (success){
+     nt.probe_pt=mu.tunePMuonBestTrack()->pt();
+     nt.probe_ptErr=mu.tunePMuonBestTrack()->ptError();
+     nt.probe_muonHits_tuneP=mu.tunePMuonBestTrack()->hitPattern().numberOfValidMuonHits();
      nt.probe_isLoose=mu.passed(reco::Muon::CutBasedIdLoose);
      nt.probe_isMedium=mu.passed(reco::Muon::CutBasedIdMedium);
      nt.probe_isTight=mu.passed(reco::Muon::CutBasedIdTight);
@@ -50,37 +67,32 @@ inline void FillProbeBranches( const MUON & mu, const std::vector<TRK> &tracks, 
      nt.probe_isHighPt=mu.passed(reco::Muon::CutBasedIdTrkHighPt);
      nt.probe_isPF=mu.isPFMuon();
      nt.probe_isGlobal=mu.isGlobalMuon();
-     if ( mu.globalTrack().isNonnull() )
+     nt.probe_isSTA=mu.isStandAloneMuon();
+     nt.probe_isTrkMuon=mu.isTrackerMuon();
+    // nt.probe_PFSumIso03=mu.isolationR03 ().sumPt();
+     nt.probe_nStation=mu.numberOfMatchedStations();
+     nt.probe_nStation_Exp=mu.expectedNnumberOfMatchedStations();
+     nt.probe_RPCLayers= mu.numberOfMatchedRPCLayers();
+     nt.probe_stMask=mu.stationMask();
+//     nt.probe_nShowers=mu.numberOfShowers();
+     if ( mu.globalTrack().isNonnull() ){
         nt.probe_trkChi2=mu.globalTrack()->normalizedChi2();
-     else
-        nt.probe_trkChi2=-99;
+        nt.probe_muonHits=mu.globalTrack()->hitPattern().numberOfValidMuonHits();
+     }
      if ( mu.innerTrack().isNonnull() &&  mu.innerTrack().isAvailable() ){
         nt.probe_validFraction=mu.innerTrack()->validFraction();
         nt.probe_trackerLayers=mu.innerTrack()->hitPattern().trackerLayersWithMeasurement();
         nt.probe_pixelLayers=mu.innerTrack()->hitPattern().pixelLayersWithMeasurement();
+        nt.probe_pixelHits=mu.innerTrack()->hitPattern().numberOfValidPixelHits();
         nt.probe_dxy=mu.innerTrack()->dxy(reco::TrackBase::Point(nt.pv_x,nt.pv_y,nt.pv_z));
         nt.probe_dz=mu.innerTrack()->dz(reco::TrackBase::Point(nt.pv_x,nt.pv_y,nt.pv_z));
-    } else{
-        nt.probe_validFraction=-99;   nt.probe_trackerLayers=-99;   
-        nt.probe_pixelLayers=-99;     nt.probe_dxy=-99;  
-        nt.probe_dz=-99;
     }
      nt.probe_positionChi2=mu.combinedQuality().chi2LocalPosition;
      nt.probe_trkKink=mu.combinedQuality().trkKink;
 //     nt.probe_segmentCompatibility= 
      nt.probe_isMuMatched=true;
   }
-   else{
-     
-     nt.probe_isLoose=false;        nt.probe_isMedium=false;
-     nt.probe_isTight=false;        nt.probe_isSoft=false;
-     nt.probe_isHighPt=false;       nt.probe_isMuMatched=false;
-     nt.probe_isPF=false;           nt.probe_isGlobal=false;
-     nt.probe_validFraction=-99;    nt.probe_trkChi2=-99;
-     nt.probe_positionChi2=-99;     nt.probe_trkKink=-99;
-     nt. probe_trackerLayers=-99;   nt. probe_pixelLayers=-99;
-     nt.probe_dxy=-99;              nt.probe_dz=-99;
-  }
+
 }
 
 template<typename MUO, typename TRK>

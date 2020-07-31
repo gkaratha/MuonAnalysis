@@ -111,7 +111,7 @@ private:
   std::vector<std::string> ProbeFilters_;
 
   const double trgDRwindow_;
-  const unsigned int tagQual_;
+  const int tagQual_;
   const StringCutObjectSelector<reco::Muon>  tagSelection_; //kinematic cuts for tag
   const bool HighPurity_;
   const StringCutObjectSelector<reco::Track>  probeSelection_; //kinematic cuts for probe
@@ -157,7 +157,7 @@ MuonFullAODAnalyzer::MuonFullAODAnalyzer(const edm::ParameterSet& iConfig):
  ProbePaths_(iConfig.getParameter<std::vector<std::string>>("ProbePaths")),
  ProbeFilters_(iConfig.getParameter<std::vector<std::string>>("ProbeFilters")),
  trgDRwindow_(iConfig.getParameter<double>("trgDRwindow")),
- tagQual_(iConfig.getParameter<unsigned>("tagQuality")),
+ tagQual_(iConfig.getParameter<int>("tagQuality")),
  tagSelection_(iConfig.getParameter<std::string>("tagSelection")),
  HighPurity_(iConfig.getParameter<bool>("probeHPyrity")),
  probeSelection_(iConfig.getParameter<std::string>("probeSelection")),
@@ -219,6 +219,7 @@ MuonFullAODAnalyzer::HLTmuon(const edm::Event& iEvent, std::vector<float>& trg_p
       for (size_t j = 0; j < keys.size(); j++) {
         trigger::TriggerObject foundObject = (allTriggerObjects)[keys[j]];
         if (fabs(foundObject.id())!=13) continue;
+        std::cout<<"pt "<<foundObject.pt()<<std::endl;
         trg_pt.push_back(foundObject.pt());
         trg_eta.push_back(foundObject.eta());
         trg_phi.push_back(foundObject.phi());
@@ -256,6 +257,7 @@ MuonFullAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   //information about run
   nt.ClearBranches();
   nt.run=iEvent.id().run();         nt.ls=iEvent.luminosityBlock();  
+  nt.event=iEvent.id().event();
   nt.fromFullAOD=true;
   nt.BSpot_x= theBeamSpot->x0();    nt.BSpot_y= theBeamSpot->y0();
   nt.BSpot_z= theBeamSpot->z0();
@@ -314,18 +316,22 @@ MuonFullAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       idx=&mu-&muons->at(0);
     }
     if (debug_>0) std::cout<<"Trg "<<itrg<<" min DR "<<minDR<<std::endl;
-    if (minDR<trgDRwindow_) trg_idx.push_back(idx);
+    if (minDR<trgDRwindow_){
+      std::cout<<"ok"<<std::endl;
+      trg_idx.push_back(idx);
+    }
     if (minDR<trgDRwindow_ && debug_>0) std::cout<<"matched ! "<<std::endl;
     
   }
   nt.nmuons=muons->size();
   nt.ntag=trg_idx.size();
-
   //select tags
   RecoTrkAndTransientTrkCollection tag_trkttrk;
   std::vector<bool> genmatched_tag;
   for(const reco::Muon &mu: *muons){
-    if (!mu.passed(pow(2,tagQual_))) continue;
+    std::cout<<"loop idx "<<&mu-&muons->at(0)<<" trg idx "<<trg_idx[0]<<std::endl;
+    if ( !(tagQual_<0) && !mu.passed(1UL<<tagQual_) ) continue;
+
     if (!tagSelection_(mu)) continue;
     if ( std::find(trg_idx.begin(),trg_idx.end(),&mu-&muons->at(0))== trg_idx.end())    continue;
     tag_trkttrk.emplace_back(std::make_pair( mu,

@@ -44,11 +44,19 @@ NtupleContent::CreateBranches(const std::vector<std::string> & HLTs){
   t1->Branch("tag_isHighPt", &tag_isHighPt);
   t1->Branch("tag_relIso04", &tag_relIso04);
   t1->Branch("tag_isMatchedGen", &tag_isMatchedGen);
+
+  t1->Branch("tag_ptErr", &tag_ptErr);
+  t1->Branch("tag_PFSumIso03", &tag_PFSumIso03);
+  t1->Branch("tag_isGlobal", &tag_isGlobal);
+  t1->Branch("tag_isSTA", &tag_isSTA);
+  t1->Branch("tag_isTrkMuon", &tag_isTrkMuon);
+
   // probe specific
   t1->Branch("iprobe", &iprobe);
   t1->Branch("probe_pt", &probe_pt);
   t1->Branch("probe_eta", &probe_eta);
   t1->Branch("probe_phi", &probe_phi);
+  t1->Branch("probe_ptErr", &probe_ptErr);
   t1->Branch("probe_isLoose", &probe_isLoose);
   t1->Branch("probe_isMedium", &probe_isMedium);
   t1->Branch("probe_isTight", &probe_isTight);
@@ -57,6 +65,10 @@ NtupleContent::CreateBranches(const std::vector<std::string> & HLTs){
   t1->Branch("probe_isMuMatched", &probe_isMuMatched);
   t1->Branch("probe_isPF", &probe_isPF);
   t1->Branch("probe_isGlobal", &probe_isGlobal);
+
+  t1->Branch("probe_isTrkMuon", &probe_isTrkMuon);
+  t1->Branch("probe_isSTA", &probe_isSTA);
+
 //  t1->Branch("probe_isGood", &probe_isGood);
   t1->Branch("probe_isHighPurity", &probe_isHighPurity);
   t1->Branch("probe_validFraction", &probe_validFraction);
@@ -70,6 +82,22 @@ NtupleContent::CreateBranches(const std::vector<std::string> & HLTs){
   t1->Branch("probe_dz", &probe_dz);
   t1->Branch("probe_relIso04", &probe_relIso04);
   t1->Branch("probe_isMatchedGen", &probe_isMatchedGen);
+
+  t1->Branch("probe_PFSumIso03", &probe_PFSumIso03);
+  t1->Branch("probe_pixelHits", &probe_pixelHits);
+  t1->Branch("probe_muonHits", &probe_muonHits);
+  t1->Branch("probe_muonHits_tuneP", &probe_muonHits_tuneP);
+  t1->Branch("probe_nStation", &probe_nStation);
+  t1->Branch("probe_pixelHits", &probe_pixelHits);
+  t1->Branch("probe_muonHits", &probe_muonHits);
+  t1->Branch("probe_nStation", &probe_nStation);
+  t1->Branch("probe_nStation_Exp", &probe_nStation_Exp);
+  t1->Branch("probe_RPCLayers", &probe_RPCLayers);
+  t1->Branch("probe_stMask", &probe_stMask);
+  t1->Branch("probe_nShowers", &probe_nShowers);
+  t1->Branch("probe_ptErr", &probe_ptErr);
+  
+
   // pair specific
   t1->Branch("pair_pt", &pair_pt);
   t1->Branch("pair_eta", &pair_eta);
@@ -121,6 +149,11 @@ NtupleContent::ClearBranches(){
   probe_trackerLayers=-99; probe_pixelLayers=-99;     probe_dxy=-99;
   probe_dz=-99;           probe_relIso04=-99;
   probe_isMatchedGen=false;
+
+
+  probe_pixelHits=0;      probe_muonHits=0;          probe_muonHits_tuneP=0;
+  probe_nStation=0;       probe_RPCLayers=0;         probe_stMask=0;
+  probe_nShowers=0;       probe_nStation_Exp=0;
 
   pair_pt=0;              pair_mass=0;                pair_eta=-99;
   pair_phi=-99;           pair_fit_mass=0;            pair_svprob=0; 

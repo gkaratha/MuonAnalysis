@@ -115,7 +115,7 @@ private:
   edm::EDGetTokenT<edm::View<reco::GenParticle> > genToken_;
   std::vector<std::string> HLTPaths_;
   std::vector<std::string> ProbePaths_;
-  const unsigned int tagQual_;
+  const int tagQual_;
   const StringCutObjectSelector<pat::Muon>  tagSelection_; //kinematic cuts for tag
   const bool HighPurity_;
   const StringCutObjectSelector<pat::PackedCandidate>  probeSelection_; //kinematic cuts for probe
@@ -159,7 +159,7 @@ trgresultsToken_(consumes<edm::TriggerResults >(iConfig.getParameter<edm::InputT
  genToken_(consumes<edm::View<reco::GenParticle> >(iConfig.getParameter<edm::InputTag>("gen"))),
  HLTPaths_(iConfig.getParameter<std::vector<std::string>>("HLTPaths")),
  ProbePaths_(iConfig.getParameter<std::vector<std::string>>("ProbePaths")),
- tagQual_(iConfig.getParameter<unsigned>("tagQuality")),
+ tagQual_(iConfig.getParameter<int>("tagQuality")),
  tagSelection_(iConfig.getParameter<std::string>("tagSelection")),
  HighPurity_(iConfig.getParameter<bool>("ProbeHPyrity")),
  probeSelection_(iConfig.getParameter<std::string>("probeSelection")),
@@ -267,7 +267,7 @@ MuonMiniAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   RecoTrkAndTransientTrkCollection tag_muon_ttrack; 
   std::vector<bool> genmatched_tag;
   for( const pat::Muon &mu : *muons){
-    if ( mu.passed(pow(2,tagQual_)) ) continue;
+    if ( !(tagQual_<0) && mu.passed(1UL<<tagQual_) ) continue;
     bool fired=false;
     for ( const std::string path: HLTPaths_){
       char cstr[ (path+"*").size() + 1];
