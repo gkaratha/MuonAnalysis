@@ -4,7 +4,7 @@ common:
     splitting: 20
     globaltag: 102X_dataRun2_v11
   mc:
-    splitting: 1
+    splitting: 5
     globaltag: 102X_upgrade2018_realistic_v15
 
 samples:
@@ -21,7 +21,7 @@ samples:
     isAOD: True
     isMC:  True
   MINIAODSIM_ZToMuMu:
-    dataset: /ZToMuMu_NNPDF31_TuneCP5_13TeV-powheg-pythia8_M_50_120/RunIISummer19UL18MiniAOD-106X_upgrade2018_realistic_v11_L1v1-v2/MINIAODSIM
+    dataset: /ZToMuMu_NNPDF31_13TeV-powheg_M_50_120/RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v2/MINIAODSIM
     isAOD: False
     isMC:  True
 

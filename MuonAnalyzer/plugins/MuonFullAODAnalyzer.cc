@@ -219,7 +219,6 @@ MuonFullAODAnalyzer::HLTmuon(const edm::Event& iEvent, std::vector<float>& trg_p
       for (size_t j = 0; j < keys.size(); j++) {
         trigger::TriggerObject foundObject = (allTriggerObjects)[keys[j]];
         if (fabs(foundObject.id())!=13) continue;
-        std::cout<<"pt "<<foundObject.pt()<<std::endl;
         trg_pt.push_back(foundObject.pt());
         trg_eta.push_back(foundObject.eta());
         trg_phi.push_back(foundObject.phi());
@@ -316,10 +315,7 @@ MuonFullAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
       idx=&mu-&muons->at(0);
     }
     if (debug_>0) std::cout<<"Trg "<<itrg<<" min DR "<<minDR<<std::endl;
-    if (minDR<trgDRwindow_){
-      std::cout<<"ok"<<std::endl;
-      trg_idx.push_back(idx);
-    }
+    if (minDR<trgDRwindow_) trg_idx.push_back(idx);    
     if (minDR<trgDRwindow_ && debug_>0) std::cout<<"matched ! "<<std::endl;
     
   }
@@ -329,7 +325,6 @@ MuonFullAODAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   RecoTrkAndTransientTrkCollection tag_trkttrk;
   std::vector<bool> genmatched_tag;
   for(const reco::Muon &mu: *muons){
-    std::cout<<"loop idx "<<&mu-&muons->at(0)<<" trg idx "<<trg_idx[0]<<std::endl;
     if ( !(tagQual_<0) && !mu.passed(1UL<<tagQual_) ) continue;
 
     if (!tagSelection_(mu)) continue;

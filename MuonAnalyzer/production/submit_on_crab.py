@@ -89,11 +89,10 @@ if __name__ == '__main__':
         
         config.JobType.pyCfgParams = [
             'isFullAOD=%s' % isFullAOD, 'reportEvery=1000',
-            'outputName=%s' % production_tag, 'isMC=%s' % isMC,
-            'globalTag=%s' % globaltag,
+            'isMC=%s' % isMC, 'globalTag=%s' % globaltag
         ]
         
-        config.JobType.outputFiles = ['_'.join(['muon_ntuples', 'mc' if isMC else 'data', production_tag])+'.root']
+        config.JobType.outputFiles = ['_'.join(['muon_ntuples', 'mc' if isMC else 'data',  'full' if isFullAOD else 'mini'])+'.root']
         
         print config
         submit(config)
